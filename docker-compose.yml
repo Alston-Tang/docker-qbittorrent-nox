@@ -16,12 +16,7 @@ services:
       #- TZ=UTC
       #- UMASK=022
     image: qbittorrentofficial/qbittorrent-nox:${QBT_VERSION}
-    ports:
-      # for bittorrent traffic
-      - 6881:6881/tcp
-      - 6881:6881/udp
-      # for WebUI
-      - ${QBT_WEBUI_PORT}:${QBT_WEBUI_PORT}/tcp
+    network_mode: "host"
     read_only: true
     stop_grace_period: 30m
     tmpfs:
