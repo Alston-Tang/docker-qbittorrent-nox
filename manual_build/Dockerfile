@@ -4,6 +4,18 @@ FROM alpine:latest AS base
 RUN \
   apk --no-cache --update-cache upgrade
 
+# run-time dependencies
+RUN \
+  apk --no-cache add \
+    bash \
+    curl \
+    doas \
+    python3 \
+    qt6-qtbase \
+    qt6-qtbase-sqlite \
+    tini \
+    tzdata
+
 # image for building
 FROM base AS builder
 
@@ -38,7 +50,7 @@ RUN \
 # https://sourceware.org/binutils/docs/ld/Options.html
 ENV CFLAGS="-pipe -fstack-clash-protection -fstack-protector-strong -fno-plt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -D_GLIBCXX_ASSERTIONS" \
     CXXFLAGS="-pipe -fstack-clash-protection -fstack-protector-strong -fno-plt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -D_GLIBCXX_ASSERTIONS" \
-    LDFLAGS="-gz -Wl,-O1,--as-needed,--sort-common,-z,now,-z,relro"
+    LDFLAGS="-gz -Wl,-O1,--as-needed,--sort-common,-z,now,-z,pack-relative-relocs,-z,relro"
 
 # build libtorrent
 RUN \
@@ -115,17 +127,6 @@ RUN \
 
 # image for running
 FROM base
-
-RUN \
-  apk --no-cache add \
-    bash \
-    curl \
-    doas \
-    python3 \
-    qt6-qtbase \
-    qt6-qtbase-sqlite \
-    tini \
-    tzdata
 
 RUN \
   adduser \
